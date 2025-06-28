@@ -2,7 +2,7 @@
 
 ## 🌟 Demo
 
-[Live Demo](https://cvora.vercel.app/
+[Live Demo](https://cvora.vercel.app/)
 
 ## ✨ Features
 
