@@ -4,6 +4,7 @@ import { CVPreview } from './CVPreview';
 import type { CVData, CVTemplate } from '../types/cv';
 import { generatePDF } from '../utils/pdfGenerator';
 import { Download, Eye, Edit3, FileText, Palette } from 'lucide-react';
+import { useRef } from 'react';
 
 const initialCVData: CVData = {
   personalInfo: {
@@ -45,6 +46,14 @@ export const CVora: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
   const [selectedTemplate, setSelectedTemplate] = useState<CVTemplate>('modern');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const resetButtonRef = useRef<HTMLButtonElement>(null);
+
+  const handleResetConfirm = () => {
+    setCvData(initialCVData);
+    localStorage.removeItem('cvData');
+    setShowResetModal(false);
+  };
 
   // Auto-save to localStorage
   useEffect(() => {
@@ -104,13 +113,6 @@ export const CVora: React.FC = () => {
     }, 500);
   };
 
-  const resetForm = () => {
-    if (confirm('Are you sure you want to reset all data? This action cannot be undone.')) {
-      setCvData(initialCVData);
-      localStorage.removeItem('cvData');
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
       {/* Header */}
@@ -160,10 +162,11 @@ export const CVora: React.FC = () => {
                 </button>
               </div>
 
-              {/* Action Buttons */}
+                 {/* Action Buttons */}
               <div className="flex items-center gap-2">
                 <button
-                  onClick={resetForm}
+                  ref={resetButtonRef}
+                  onClick={() => setShowResetModal(true)}
                   className="hidden sm:block px-3 sm:px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200 text-sm"
                 >
                   Reset
@@ -182,6 +185,30 @@ export const CVora: React.FC = () => {
           </div>
         </div>
       </div>
+
+       {/* Reset Modal */}
+      {showResetModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Reset All Data?</h3>
+            <p className="text-gray-700 mb-4">Are you sure you want to reset all data? This action cannot be undone.</p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowResetModal(false)}
+                className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleResetConfirm}
+                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
@@ -233,7 +260,11 @@ export const CVora: React.FC = () => {
       <footer className="bg-gray-50 border-t border-gray-200 mt-8 sm:mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           <div className="text-center text-gray-600 text-sm">
-            <p>&copy; 2025 CVora. Create professional resumes with ease.</p>
+            <p>
+              {` ${new Date().toLocaleTimeString()} `}
+              &copy; {new Date().getFullYear()} CVora.  
+              Create professional resumes with ease.
+            </p>
           </div>
         </div>
       </footer>
